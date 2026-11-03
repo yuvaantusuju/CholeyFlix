@@ -1,20 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Check, ChevronDown, Copy, Download, ExternalLink, Film, Tv, X } from "lucide-react";
+import { Check, ChevronDown, Copy, Download, Film, Tv, X } from "lucide-react";
 import type { DownloadLink, Episode, Title } from "../types";
 import { useAppState } from "../state/AppState";
 import { formatBytes, timeAgo } from "../lib/utils";
 import { SmartImage, TitleCard } from "./UI";
 
-function LinkRow({
-  link,
-  onQueue,
-  queued,
-}: {
-  link: DownloadLink;
-  onQueue: () => void;
-  queued: boolean;
-}) {
+function LinkRow({ link }: { link: DownloadLink }) {
   const { toast } = useAppState();
   const [copied, setCopied] = useState(false);
   const host = useMemo(() => {
@@ -42,22 +34,17 @@ function LinkRow({
           {copied ? <Check size={13} className="text-lime" /> : <Copy size={13} />}
           {copied ? "Copied" : "Copy"}
         </button>
-        <a href={link.url} target="_blank" rel="noreferrer" className="secondary-button h-9 px-3 text-[9px]" aria-label={`Open ${link.label} in new tab`}>
-          <ExternalLink size={13} />Open
+        <a href={link.url} target="_blank" rel="noreferrer" className="primary-button h-9 px-3.5 text-[9px]" aria-label={`Download ${link.label} (opens in new tab)`}>
+          <Download size={13} />
+          Download
         </a>
-        <button onClick={onQueue} disabled={queued} className="primary-button h-9 px-3.5 text-[9px] disabled:cursor-default disabled:opacity-45">
-          {queued ? <Check size={13} /> : <Download size={13} />}
-          {queued ? "Queued" : "Download"}
-        </button>
       </div>
     </div>
   );
 }
 
-function EpisodeBlock({ title, episode }: { title: Title; episode: Episode }) {
+function EpisodeBlock({ episode }: { episode: Episode }) {
   const [open, setOpen] = useState(episode.number === 1);
-  const { tasks, enqueue } = useAppState();
-  const queuedUrls = new Set(tasks.filter((task) => ["queued", "downloading", "paused"].includes(task.status)).map((task) => task.url));
   return (
     <div className="overflow-hidden rounded-xl border border-white/[.08] bg-white/[.015]">
       <button onClick={() => setOpen((value) => !value)} className="flex w-full items-center gap-4 p-3.5 text-left transition hover:bg-white/[.03]" aria-expanded={open} aria-label={`${open ? "Collapse" : "Expand"} episode ${episode.number}: ${episode.title}`}>
@@ -75,12 +62,7 @@ function EpisodeBlock({ title, episode }: { title: Title; episode: Episode }) {
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }} className="overflow-hidden">
             <div className="space-y-2 border-t border-white/[.06] p-3.5">
               {episode.links.map((link) => (
-                <LinkRow
-                  key={link.id}
-                  link={link}
-                  queued={queuedUrls.has(link.url)}
-                  onQueue={() => enqueue(title, link, `E${episode.number} ${episode.title}`)}
-                />
+                <LinkRow key={link.id} link={link} />
               ))}
             </div>
           </motion.div>
@@ -94,14 +76,14 @@ export function TitleModal({
   title,
   onClose,
   onOpenTitle,
-  onGoDownloads,
 }: {
   title: Title | null;
   onClose: () => void;
   onOpenTitle: (title: Title) => void;
-  onGoDownloads: () => void;
+  /** No longer used (queueing was removed); kept optional so existing callers still compile. */
+  onGoDownloads?: () => void;
 }) {
-  const { titles, tasks, enqueue, enqueueAll } = useAppStateEnriched();
+  const { titles } = useAppState();
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (title) scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -126,7 +108,6 @@ export function TitleModal({
   }, [title, titles]);
 
   if (!title) return null;
-  const queuedUrls = new Set(tasks.filter((task) => ["queued", "downloading", "paused"].includes(task.status)).map((task) => task.url));
   const allLinks = title.type === "series" ? title.episodes?.flatMap((ep) => ep.links) ?? [] : title.links;
 
   return (
@@ -171,33 +152,20 @@ export function TitleModal({
               <div className="mt-8">
                 <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
                   <h3 className="font-display text-xl font-bold tracking-tight">Download links <span className="text-white/30">({allLinks.length})</span></h3>
-                  {title.type === "movie" && title.links.length > 1 && (
-                    <button
-                      onClick={() => { enqueueAll(title, title.links); }}
-                      className="secondary-button h-9 text-[9px]"
-                    >
-                      <Download size={13} />Queue all qualities
-                    </button>
-                  )}
                 </div>
                 {title.type === "movie" ? (
                   <div className="space-y-2">
                     {title.links.map((link) => (
-                      <LinkRow key={link.id} link={link} queued={queuedUrls.has(link.url)} onQueue={() => enqueue(title, link)} />
+                      <LinkRow key={link.id} link={link} />
                     ))}
                     {!title.links.length && <p className="rounded-lg border border-dashed border-white/10 p-5 text-xs text-white/30">No links published for this title yet.</p>}
                   </div>
                 ) : (
                   <div className="space-y-2.5">
-                    {title.episodes?.map((episode) => <EpisodeBlock key={episode.id} title={title} episode={episode} />)}
-                    {title.episodes?.length && title.episodes.length > 1 && (
-                      <button onClick={() => { enqueueAll(title); onGoDownloads(); }} className="secondary-button mt-1 text-[9px]">
-                        <Download size={13} />Queue every episode
-                      </button>
-                    )}
+                    {title.episodes?.map((episode) => <EpisodeBlock key={episode.id} episode={episode} />)}
                   </div>
                 )}
-                <p className="mt-4 text-[10px] leading-4 text-white/25">Transfers run in this tab and show live byte progress. If a host blocks direct transfers, use Open to download from the source page.</p>
+                <p className="mt-4 text-[10px] leading-4 text-white/25">Download opens the source link in a new tab, where the transfer is handled by your browser.</p>
               </div>
 
               {related.length > 0 && (
@@ -214,21 +182,4 @@ export function TitleModal({
       </motion.div>
     </AnimatePresence>
   );
-}
-
-// Local hook wrapper so the modal can queue a whole title in one action.
-function useAppStateEnriched() {
-  const state = useAppState();
-  const enqueueAll = (title: Title, links?: DownloadLink[]) => {
-    let added = 0;
-    if (links) {
-      for (const link of links) if (state.enqueue(title, link)) added += 1;
-    } else {
-      for (const entry of title.episodes ?? []) {
-        for (const link of entry.links) if (state.enqueue(title, link, `E${entry.number} ${entry.title}`)) added += 1;
-      }
-    }
-    return added;
-  };
-  return { ...state, enqueueAll };
 }
