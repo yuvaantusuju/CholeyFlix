@@ -1,8 +1,31 @@
 {
   "product": "CholeyFlix",
   "version": 2,
-  "exportedAt": "2026-11-03T08:41:50.261Z",
+  "exportedAt": "2026-11-03T09:05:45.118Z",
   "titles": [
+    {
+      "id": "title-mw0gq6uf-q8les",
+      "name": "Baththa",
+      "type": "movie",
+      "year": 2026,
+      "language": "Hindi,Tamil",
+      "genres": [],
+      "description": "In 1986 Madras, a timid eight-year-old boy accidentally locks a feared criminal inside a school restroom. As the man faces hunger and isolation, an unexpected friendship forms between them, transforming both their lives.",
+      "poster": "https://upload.wikimedia.org/wikipedia/en/d/d6/Baththa_poster.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original",
+      "backdrop": "https://assets-in.bmscdn.com/discovery-catalog/events/et00515520-cngmhdcwyu-landscape.jpg",
+      "accent": "#e36b45",
+      "featured": false,
+      "links": [
+        {
+          "id": "lnk-mw0glx0b-g5wh0",
+          "label": "720p",
+          "url": "https://701ab416771ea1b49a24683d35a33206.r2.cloudflarestorage.com/hub/Baththa.2026.720p.HEVC.DS4K.WEB-DL.Hindi.2.0-Tamil..ESub.x265-HDHub4u.Ag.mkv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=9117075ae9ab2bd2c1b64fc58debeee0%2F20261103%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261103T034828Z&X-Amz-Expires=18000&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22Baththa.2026.720p.HEVC.DS4K.WEB-DL.Hindi.2.0-Tamil..ESub.x265-HDHub4u.Ag.mkv%22&X-Amz-Signature=4c76aa37ace54d99bd83b0ecb5380c36629810a61893c47008237a8400bb052b",
+          "size": 1034944512
+        }
+      ],
+      "createdAt": 1793696740647,
+      "updatedAt": 1793696740647
+    },
     {
       "id": "title-mw0fsezy-u83ch",
       "name": "Karuppu",
