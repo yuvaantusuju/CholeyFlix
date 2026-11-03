@@ -126,7 +126,6 @@ function PinGate({ onBackHome }: { onBackHome: () => void }) {
         />
         {error && <p className="mt-3 text-center text-xs text-red-300">{error}</p>}
         <button onClick={submit} className="primary-button mt-4 w-full">Unlock admin</button>
-        <p className="mt-4 text-center text-[10px] leading-5 text-white/25">Demo PIN: <span className="font-mono text-lime/70">{DEFAULT_PIN}</span> — change it in Settings after signing in.</p>
         <button onClick={onBackHome} className="mx-auto mt-5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white/35 hover:text-white">
           <ArrowLeft size={12} />Back to the site
         </button>

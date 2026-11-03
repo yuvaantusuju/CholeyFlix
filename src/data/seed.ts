@@ -1,5 +1,5 @@
 import type { Title } from "../types";
-// Put choleyflix-catalog.json in the same folder as this file.
+// Put choleyflix-catalog.json in the same folder as this file (src/data/).
 // Requires "resolveJsonModule": true in tsconfig.json.
 import catalog from "./choleyflix-catalog.json";
 
@@ -9,8 +9,6 @@ const NOW = Date.now();
 // (missing arrays / timestamps) rather than rewriting the data.
 const normalize = (raw: any): Title => ({
   featured: false,
-  genres: [],
-  links: [],
   ...raw,
   genres: Array.isArray(raw.genres) ? raw.genres : [],
   links: Array.isArray(raw.links) ? raw.links : [],
