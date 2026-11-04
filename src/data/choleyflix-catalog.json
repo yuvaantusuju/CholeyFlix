@@ -1,8 +1,37 @@
 {
   "product": "CholeyFlix",
   "version": 2,
-  "exportedAt": "2026-11-03T09:05:45.118Z",
+  "exportedAt": "2026-11-04T04:19:50.637Z",
   "titles": [
+    {
+      "id": "title-mw1lydot-xk5sb",
+      "name": "Anakapalli",
+      "type": "movie",
+      "year": 2026,
+      "language": "Hindi,Telugu",
+      "genres": [],
+      "description": "A young man in Anakapalli strays into organised crime beneath a ruthless mob leader. However, falling in love compels him to weigh tyrannical power against his former dreams.",
+      "poster": "https://m.media-amazon.com/images/M/MV5BODIzZDNjODAtMjEwYi00ZDg1LWE2MTQtYmFjYWM0NjMxZjk0XkEyXkFqcGc@._V1_.jpg",
+      "backdrop": "https://m.media-amazon.com/images/S/pv-target-images/6bba51710d2121bd082657bf5091068df58ad2720490e7291f7856fe56bb2a79._SX1080_FMjpg_.jpg",
+      "accent": "#e36b45",
+      "featured": false,
+      "links": [
+        {
+          "id": "lnk-mw1lstmi-n20qk",
+          "label": "720p",
+          "url": "https://b26be7ab2ca58cec9372503da5e7eb9a.r2.cloudflarestorage.com/hub/0c26768ad71c1e94767d0df179eac305?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=3e713a3a5fe5ff5148be901c113ee67f%2F20261104%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261104T023532Z&X-Amz-Expires=28800&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22Anakapalli.2026.720p.HEVC.WEB-DL.Hindi.2.0-Telugu.ESub.x265-HDHub4u.Ms.mkv%22&X-Amz-Signature=0ed80863935d966db8b18eed5aa16c6d83f5ab22de4e5352ef4bc644c7a6eb60",
+          "size": 1004535808
+        },
+        {
+          "id": "lnk-mw1lv4hw-xkvw3",
+          "label": "1080p",
+          "url": "https://b26be7ab2ca58cec9372503da5e7eb9a.r2.cloudflarestorage.com/hub/2954deefdbe05f0105bbbd43669068b2?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=3e713a3a5fe5ff5148be901c113ee67f%2F20261104%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261104T022118Z&X-Amz-Expires=28800&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22Anakapalli.2026.1080p.HEVC.WEB-DL.Hindi.5.1-Telugu.5.1.ESub.x265-HDHub4u.Ms.mkv%22&X-Amz-Signature=47e66bffcc40c512c075ce9456270a6275b8f3e937a8bbacfd1aad3134e44120",
+          "size": 2308544922
+        }
+      ],
+      "createdAt": 1793765987021,
+      "updatedAt": 1793765987021
+    },
     {
       "id": "title-mw0gq6uf-q8les",
       "name": "Baththa",
@@ -71,18 +100,18 @@
         {
           "id": "lnk-mw0f8al4-7k9nr",
           "label": "720p",
-          "url": "https://5cf443a1e229c0b4715020b95fafcbc9.r2.cloudflarestorage.com/hub2/c7034477548692b332770768c5421bab?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=73154f7d03f398dbc4ecfff413ad3db3%2F20261103%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261103T072537Z&X-Amz-Expires=28800&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22Obsession.2025.720p.HEVC.WEB-DL.Hindi.JHS.New.Dubb.English.2.0.ESub.x265-HDHub4u.Ag.mkv%22&X-Amz-Signature=aa4a811790f75159722ae6ba8039f33d9643eb3a3e86f5ff8ae27f339e0ad6fc",
+          "url": "https://5cf443a1e229c0b4715020b95fafcbc9.r2.cloudflarestorage.com/hub2/c7034477548692b332770768c5421bab?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=73154f7d03f398dbc4ecfff413ad3db3%2F20261104%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261104T021158Z&X-Amz-Expires=28800&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22Obsession.2025.720p.HEVC.WEB-DL.Hindi.JHS.New.Dubb.English.2.0.ESub.x265-HDHub4u.Ag.mkv%22&X-Amz-Signature=d5768cb045af64702cb8533e78a44506a59d8a2903d885140b61fd5450156530",
           "size": 779962286
         },
         {
           "id": "lnk-mw0fer1a-ktrio",
           "label": "1080p",
-          "url": "https://5cf443a1e229c0b4715020b95fafcbc9.r2.cloudflarestorage.com/hub2/ed70f254b30cc0aaf9477241dc0eb760?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=73154f7d03f398dbc4ecfff413ad3db3%2F20261103%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261103T073146Z&X-Amz-Expires=28800&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22Obsession.2025.1080p.WEB-DL.Hindi.JHS.New.Dubb.English.2.0.ESub.x264-HDHub4u.Ag.mkv%22&X-Amz-Signature=31a39c6854d606835b55c1db1d78a5c7888f0bb74aef25dfd7bf2a375d75c9f6",
+          "url": "https://5cf443a1e229c0b4715020b95fafcbc9.r2.cloudflarestorage.com/hub2/ed70f254b30cc0aaf9477241dc0eb760?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=73154f7d03f398dbc4ecfff413ad3db3%2F20261104%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261104T021505Z&X-Amz-Expires=28800&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22Obsession.2025.1080p.WEB-DL.Hindi.JHS.New.Dubb.English.2.0.ESub.x264-HDHub4u.Ag.mkv%22&X-Amz-Signature=adad242aba030c6254c1fb6fb7359bc717cf6d4824e7bfcc5b84d4ff36939492",
           "size": 2168958484
         }
       ],
       "createdAt": 1793694608637,
-      "updatedAt": 1793694608637
+      "updatedAt": 1793765668604
     },
     {
       "id": "title-mw0evr5y-9dyml",
