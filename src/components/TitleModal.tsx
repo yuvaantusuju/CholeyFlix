@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Check, ChevronDown, Copy, Download, Film, Tv, X } from "lucide-react";
+import { Check, ChevronDown, Copy, Download, Film, Play, Tv, X } from "lucide-react";
 import type { DownloadLink, Episode, Title } from "../types";
 import { useAppState } from "../state/AppState";
 import { formatBytes, timeAgo } from "../lib/utils";
 import { SmartImage, TitleCard } from "./UI";
+import { VideoBox } from "./VideoBox";
 
 function LinkRow({ link }: { link: DownloadLink }) {
   const { toast } = useAppState();
@@ -85,17 +86,26 @@ export function TitleModal({
 }) {
   const { titles } = useAppState();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [playerOpen, setPlayerOpen] = useState(false);
   useEffect(() => {
-    if (title) scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    if (title) {
+      scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+      setPlayerOpen(false);
+    }
   }, [title?.id]);
   useEffect(() => {
     if (!title) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const key = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    const key = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (playerOpen) setPlayerOpen(false);
+        else onClose();
+      }
+    };
     window.addEventListener("keydown", key);
     return () => { document.body.style.overflow = previous; window.removeEventListener("keydown", key); };
-  }, [title, onClose]);
+  }, [title, onClose, playerOpen]);
 
   const related = useMemo(() => {
     if (!title) return [];
@@ -147,6 +157,10 @@ export function TitleModal({
                 <span>{title.year}</span><span className="h-1 w-1 rounded-full bg-white/25" /><span>{title.language}</span>
                 <span className="h-1 w-1 rounded-full bg-white/25" /><span>{title.genres.join(" / ")}</span>
               </div>
+              <button onClick={() => setPlayerOpen(true)} className="primary-button mt-5" aria-label={`Play ${title.name}`}>
+                <Play size={15} fill="currentColor" />
+                Play {title.type === "series" ? "series" : "movie"}
+              </button>
               <p className="mt-5 max-w-2xl text-sm leading-7 text-white/55">{title.description}</p>
 
               <div className="mt-8">
@@ -179,6 +193,7 @@ export function TitleModal({
             </div>
           </div>
         </motion.article>
+        {playerOpen && <VideoBox title={title} onClose={() => setPlayerOpen(false)} />}
       </motion.div>
     </AnimatePresence>
   );

@@ -37,7 +37,7 @@ function UrlStatus({ url }: { url: string }) {
 }
 
 type DraftLink = { id: string; label: string; url: string; size: string };
-type DraftEpisode = { id: string; number: string; title: string; links: DraftLink[] };
+type DraftEpisode = { id: string; number: string; title: string; videoUrl: string; links: DraftLink[] };
 
 const ACCENTS = ["#e36b45", "#b7d63e", "#4b9bb5", "#a970d5", "#e84a75", "#c69c5c", "#71876b", "#4f9c9b", "#d76340", "#8f8578"];
 
@@ -52,7 +52,7 @@ function parseSize(value: string): number | undefined {
 }
 
 const emptyLink = (): DraftLink => ({ id: uid("lnk"), label: "", url: "", size: "" });
-const emptyEpisode = (number: number): DraftEpisode => ({ id: uid("ep"), number: String(number), title: "", links: [emptyLink()] });
+const emptyEpisode = (number: number): DraftEpisode => ({ id: uid("ep"), number: String(number), title: "", videoUrl: "", links: [emptyLink()] });
 
 function LinkEditor({ link, onChange, onRemove }: { link: DraftLink; onChange: (patch: Partial<DraftLink>) => void; onRemove: () => void }) {
   const urlInvalid = link.url.trim() !== "" && !isValidUrl(link.url.trim());
@@ -85,12 +85,14 @@ export function TitleForm({ editingId, prefill, onDone }: { editingId: string | 
   const [backdrop, setBackdrop] = useState(existing?.backdrop ?? "");
   const [accent, setAccent] = useState(existing?.accent ?? ACCENTS[0]);
   const [featured, setFeatured] = useState(existing?.featured ?? false);
+  const [videoUrl, setVideoUrl] = useState(existing?.videoUrl ?? "");
   const [links, setLinks] = useState<DraftLink[]>(existing?.links.map((link) => ({ id: link.id, label: link.label, url: link.url, size: link.size ? String(link.size) : "" })) ?? [emptyLink()]);
   const [episodes, setEpisodes] = useState<DraftEpisode[]>(
     existing?.episodes?.map((episode) => ({
       id: episode.id,
       number: String(episode.number),
       title: episode.title,
+      videoUrl: episode.videoUrl ?? "",
       links: episode.links.map((link) => ({ id: link.id, label: link.label, url: link.url, size: link.size ? String(link.size) : "" })),
     })) ?? [emptyEpisode(1)],
   );
@@ -122,12 +124,15 @@ export function TitleForm({ editingId, prefill, onDone }: { editingId: string | 
         id: episode.id,
         number: Number(episode.number) || index + 1,
         title: episode.title.trim() || `Episode ${index + 1}`,
+        videoUrl: episode.videoUrl.trim() || undefined,
         links: buildLinks(episode.links),
       }));
     if (type === "movie" && !movieLinks.length) problems.push("Add at least one valid download link for a movie.");
+    if (type === "movie" && videoUrl.trim() && !isValidUrl(videoUrl.trim())) problems.push("The movie playback URL must be a valid http(s) URL.");
     if (type === "series") {
       if (!builtEpisodes.length) problems.push("Add at least one episode for a series.");
       else if (builtEpisodes.some((episode) => !episode.links.length)) problems.push("Every episode needs at least one valid download link.");
+      if (builtEpisodes.some((episode) => episode.videoUrl && !isValidUrl(episode.videoUrl))) problems.push("Every episode playback URL must be a valid http(s) URL.");
     }
     if (problems.length) {
       setErrors(problems);
@@ -148,6 +153,7 @@ export function TitleForm({ editingId, prefill, onDone }: { editingId: string | 
       backdrop: backdrop.trim() || posterFinal || undefined,
       accent,
       featured,
+      videoUrl: type === "movie" ? videoUrl.trim() || undefined : undefined,
       links: type === "movie" ? movieLinks : [],
       episodes: type === "series" ? builtEpisodes : undefined,
       createdAt: existing?.createdAt ?? now,
@@ -166,7 +172,7 @@ export function TitleForm({ editingId, prefill, onDone }: { editingId: string | 
       <div>
         <p className="eyebrow">{existing ? "Editing" : "New entry"}</p>
         <h1 className="mt-2 font-display text-4xl font-black tracking-[-2px] sm:text-5xl">{existing ? existing.name : "Add a title"}</h1>
-        <p className="mt-3 max-w-xl text-xs leading-6 text-white/40">Paste the movie or series name and its download links. Users see exactly what you publish here — labels, sizes, and URLs.</p>
+        <p className="mt-3 max-w-xl text-xs leading-6 text-white/40">Add catalog details, optional playable video URLs, and download links. Playback URLs are separate from downloads.</p>
         {prefill && !existing && (
           <div className="mt-5 rounded-lg border border-lime/25 bg-lime/[.05] p-4 text-xs leading-6 text-white/50">
             <p className="font-bold uppercase tracking-wider text-lime">Fulfilling a user request</p>
@@ -235,6 +241,12 @@ export function TitleForm({ editingId, prefill, onDone }: { editingId: string | 
 
           {type === "movie" ? (
             <section className="rounded-xl border border-white/[.08] bg-white/[.015] p-5">
+              <div className="mb-5">
+                <label className="field-label">Movie playback URL (optional)</label>
+                <input className={`text-input font-mono !text-[11px] ${videoUrl.trim() && !isValidUrl(videoUrl.trim()) ? "!border-red-400/60" : ""}`} placeholder="https://… playable MP4 or WebM URL" value={videoUrl} onChange={(event) => setVideoUrl(event.target.value)} />
+                <p className="mt-1.5 text-[10px] leading-4 text-white/30">Use a video URL the browser can play and that you are authorized to distribute. Download links below are not used for playback.</p>
+                {videoUrl.trim() && !isValidUrl(videoUrl.trim()) && <p className="mt-1 text-[10px] text-red-300">Must be a valid http(s) URL</p>}
+              </div>
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="flex items-center gap-2 font-display text-lg font-bold"><Link2 size={16} className="text-lime" />Download links *</h2>
                 <button type="button" onClick={() => setLinks((current) => [...current, emptyLink()])} className="secondary-button h-9 text-[9px]"><Plus size={13} />Add link</button>
@@ -260,6 +272,11 @@ export function TitleForm({ editingId, prefill, onDone }: { editingId: string | 
                       <button onClick={() => setEpisodes((current) => (current.length > 1 ? current.filter((entry) => entry.id !== episode.id) : current))} className="grid h-[42px] place-items-center rounded-md border border-white/10 text-white/30 transition hover:border-red-400/40 hover:text-red-300" aria-label="Remove episode">
                         <Trash2 size={14} />
                       </button>
+                    </div>
+                    <div className="mb-3">
+                      <label className="field-label">Episode playback URL (optional)</label>
+                      <input className={`text-input font-mono !text-[11px] ${episode.videoUrl.trim() && !isValidUrl(episode.videoUrl.trim()) ? "!border-red-400/60" : ""}`} placeholder="https://… playable MP4 or WebM URL" value={episode.videoUrl} onChange={(event) => patchEpisode(episode.id, { videoUrl: event.target.value })} />
+                      {episode.videoUrl.trim() && !isValidUrl(episode.videoUrl.trim()) && <p className="mt-1 text-[10px] text-red-300">Must be a valid http(s) URL</p>}
                     </div>
                     <div className="space-y-2.5">
                       {episode.links.map((link) => (

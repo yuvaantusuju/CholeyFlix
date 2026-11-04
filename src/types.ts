@@ -12,6 +12,7 @@ export type Episode = {
   number: number;
   title: string;
   image?: string;
+  videoUrl?: string;
   links: DownloadLink[];
 };
 
@@ -27,6 +28,7 @@ export type Title = {
   backdrop?: string;
   accent: string;
   featured: boolean;
+  videoUrl?: string;
   links: DownloadLink[];
   episodes?: Episode[];
   createdAt: number;
