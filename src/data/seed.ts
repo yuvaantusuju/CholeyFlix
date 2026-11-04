@@ -20,3 +20,6 @@ const normalize = (raw: any): Title => ({
 export const seedTitles: Title[] = (catalog.titles as any[]).map(normalize);
 
 export const DEFAULT_PIN = "choley123";
+
+// Changes every time you export a new catalog, so no manual bumping needed.
+export const SEED_VERSION: string = String(catalog.exportedAt);
