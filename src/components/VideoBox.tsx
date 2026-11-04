@@ -5,28 +5,48 @@ import type { Episode, Title } from "../types";
 import { isValidUrl } from "../lib/utils";
 import { SmartImage } from "./UI";
 
+type CatalogLink = { id: string; label?: string; url: string };
+
+// Use the catalog link exactly as saved. Also accepts pasted <iframe src="..."> code.
+function toEmbedUrl(raw?: string): string | undefined {
+  if (!raw) return undefined;
+  let value = raw.trim();
+  const iframeSrc = value.match(/<iframe[^>]*\ssrc=["']([^"']+)["']/i)?.[1];
+  if (iframeSrc) value = iframeSrc;
+  if (value.startsWith("//")) value = `https:${value}`;
+  return isValidUrl(value) ? value : undefined;
+}
+
 export function VideoBox({ title, onClose }: { title: Title; onClose: () => void }) {
   const episodes = title.episodes ?? [];
+  const hasVideo = (item: any) => Boolean(item?.videoUrl || item?.links?.length);
   const [episodeId, setEpisodeId] = useState(
-    () => episodes.find((episode) => episode.videoUrl)?.id ?? episodes[0]?.id ?? "",
+    () => episodes.find(hasVideo)?.id ?? episodes[0]?.id ?? "",
   );
-  const [playbackError, setPlaybackError] = useState(false);
+  const [linkId, setLinkId] = useState("");
   const episode = episodes.find((item) => item.id === episodeId);
-  const videoUrl = title.type === "movie" ? title.videoUrl : episode?.videoUrl;
-  const playableUrl = videoUrl && isValidUrl(videoUrl) ? videoUrl : undefined;
+
+  // Links come from the catalog: movie -> title, series -> selected episode
+  const owner: any = title.type === "movie" ? title : episode;
+  const catalogLinks: CatalogLink[] = ((owner?.links as CatalogLink[] | undefined) ?? []).filter(
+    (link) => toEmbedUrl(link?.url),
+  );
+  const activeLink = catalogLinks.find((link) => link.id === linkId) ?? catalogLinks[0];
+
+  // Prefer the catalog's videoUrl; otherwise use the catalog link
+  const embedUrl = toEmbedUrl(owner?.videoUrl) ?? toEmbedUrl(activeLink?.url);
 
   useEffect(() => {
-    setEpisodeId(episodes.find((item) => item.videoUrl)?.id ?? episodes[0]?.id ?? "");
+    setEpisodeId(episodes.find(hasVideo)?.id ?? episodes[0]?.id ?? "");
+    setLinkId("");
   }, [title.id]);
-
-  useEffect(() => {
-    setPlaybackError(false);
-  }, [playableUrl]);
 
   const selectEpisode = (item: Episode) => {
     setEpisodeId(item.id);
-    setPlaybackError(false);
+    setLinkId("");
   };
+
+  const label = `${title.name}${episode ? ` episode ${episode.number}` : ""}`;
 
   return (
     <AnimatePresence>
@@ -67,16 +87,15 @@ export function VideoBox({ title, onClose }: { title: Title; onClose: () => void
           </div>
 
           <div className="bg-black">
-            {playableUrl && !playbackError ? (
-              <video
-                key={playableUrl}
-                className="aspect-video max-h-[70vh] w-full bg-black"
-                src={playableUrl}
-                controls
-                autoPlay
-                playsInline
-                onError={() => setPlaybackError(true)}
-                aria-label={`${title.name}${episode ? ` episode ${episode.number}` : ""} video`}
+            {embedUrl ? (
+              <iframe
+                key={embedUrl}
+                className="aspect-video max-h-[70vh] w-full border-0 bg-black"
+                src={embedUrl}
+                title={label}
+                allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                allowFullScreen
+                referrerPolicy="no-referrer"
               />
             ) : (
               <div className="relative grid aspect-video place-items-center overflow-hidden bg-[#0c090c] p-6 text-center">
@@ -90,18 +109,34 @@ export function VideoBox({ title, onClose }: { title: Title; onClose: () => void
                   <span className="mx-auto grid h-14 w-14 place-items-center rounded-full border border-lime/25 bg-lime/10 text-lime">
                     <Play size={22} fill="currentColor" />
                   </span>
-                  <h3 className="mt-4 font-display text-xl font-bold text-cream">
-                    {playbackError ? "This video could not be played" : "No playback link added yet"}
-                  </h3>
+                  <h3 className="mt-4 font-display text-xl font-bold text-cream">No playback link added yet</h3>
                   <p className="mt-2 text-xs leading-5 text-white/45">
-                    {playbackError
-                      ? "Check that the URL is reachable and in a video format supported by this browser."
-                      : "Add an authorized, browser-playable video URL in the admin title editor. Download links are kept separate."}
+                    This title has no <code>videoUrl</code> or link in the catalog.
                   </p>
                 </div>
               </div>
             )}
           </div>
+
+          {catalogLinks.length > 1 && (
+            <div className="flex flex-wrap items-center gap-2 border-t border-white/[.08] p-4 sm:px-5">
+              <p className="eyebrow mr-1">Quality</p>
+              {catalogLinks.map((link, index) => (
+                <button
+                  key={link.id}
+                  onClick={() => setLinkId(link.id)}
+                  aria-pressed={link.id === activeLink?.id}
+                  className={`rounded-lg border px-3 py-1.5 text-xs transition ${
+                    link.id === activeLink?.id
+                      ? "border-lime/50 bg-lime/10 text-cream"
+                      : "border-white/10 bg-white/[.02] text-white/55 hover:border-white/25"
+                  }`}
+                >
+                  {link.label || `Link ${index + 1}`}
+                </button>
+              ))}
+            </div>
+          )}
 
           {title.type === "series" && episodes.length > 0 && (
             <div className="border-t border-white/[.08] p-4 sm:p-5">
@@ -120,7 +155,7 @@ export function VideoBox({ title, onClose }: { title: Title; onClose: () => void
                   >
                     <span className="block text-[9px] font-bold uppercase tracking-wider text-lime/80">Episode {item.number}</span>
                     <span className="mt-1 block max-w-40 truncate text-xs">{item.title}</span>
-                    <span className="mt-1 block text-[9px] text-white/30">{item.videoUrl ? "Video ready" : "No video link"}</span>
+                    <span className="mt-1 block text-[9px] text-white/30">{hasVideo(item) ? "Video ready" : "No video link"}</span>
                   </button>
                 ))}
               </div>
